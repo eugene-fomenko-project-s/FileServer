@@ -1,8 +1,6 @@
 package server;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -10,22 +8,22 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class server {
+public class server implements Runnable {
     HashMap<Integer, String> IDENTY;
-    final int PORT = 12123;
-    final String ADDRESS = "127.0.0.1";
     final String DATA_DIR = "C:\\Users\\fomen\\IdeaProjects\\Car Sharing\\Car Sharing\\File Server\\File Server\\task\\src\\server\\data";
     int ID;
     String BY_WHAT;
+    static Socket client;
 
+    public server(Socket client) {
+        server.client = client;
+    }
     @SuppressWarnings("unchecked")
-    server() {
-
-        try (ServerSocket server = new ServerSocket(PORT, 50, InetAddress.getByName(ADDRESS))) {
+    @Override
+    public void run() {
             System.out.println("Server started!");
             while (true) {
                 try (
-                        Socket client = server.accept();
                         DataInputStream input = new DataInputStream(client.getInputStream());
                         DataOutputStream output = new DataOutputStream(client.getOutputStream())
                 ) {
@@ -227,10 +225,9 @@ public class server {
                     }
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException(e);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-    }
 }
